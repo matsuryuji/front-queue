@@ -1,41 +1,44 @@
 import React from "react";
-import { fetchQueues } from "@/api";
 import { Card } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
 import RowQueue from "../RowQueue/RowQueue";
 import type { Queue } from "@/types/Queue";
 
-const ListQueue: React.FC = () => {
-  const { data, error, isLoading } = useQuery<Array<Queue>>({
-    queryKey: ["queues"],
-    queryFn: fetchQueues,
-  });
+type Props = {
+  connected: Queue[];
+  disconnected: Queue[];
+};
 
-  if (isLoading) return <div>Carregando...</div>;
-  if (error instanceof Error) return <div>Erro: {error.message}</div>;
-
+const ListQueue: React.FC<Props> = ({ connected, disconnected }) => {
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Filas Conectadas</h2>
-      <div className="space-y-2">
-        {data
-          ?.filter((queue) => queue.status === "conectada")
-          .map((queue) => (
-            <Card key={queue.id} className="p-4 border rounded">
-              <RowQueue queue={queue} />
-            </Card>
-          ))}
+    <div className="space-y-6 mt-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Filas Conectadas</h2>
+        {connected.length === 0 ? (
+          <p className="text-gray-500">Nenhuma fila conectada.</p>
+        ) : (
+          <div className="space-y-2">
+            {connected.map((queue) => (
+              <Card key={queue.id} className="p-4 border rounded">
+                <RowQueue queue={queue} />
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
-      <h2 className="text-2xl font-bold">Filas Desconectadas</h2>
-      <div className="space-y-2">
-        {data
-          ?.filter((queue) => queue.status === "desconectada")
-          .map((queue) => (
-            <Card key={queue.id} className="p-4 border rounded">
-              <RowQueue queue={queue} />
-            </Card>
-          ))}
+      <div>
+        <h2 className="text-2xl font-bold mb-2">Filas Desconectadas</h2>
+        {disconnected.length === 0 ? (
+          <p className="text-gray-500">Nenhuma fila desconectada.</p>
+        ) : (
+          <div className="space-y-2">
+            {disconnected.map((queue) => (
+              <Card key={queue.id} className="p-4 border rounded">
+                <RowQueue queue={queue} />
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
